@@ -6,21 +6,25 @@
 //
 
 import UIKit
+import CoreData
 
 // Inherite UITableViewController and having a UITableViewController (instead just View)
 // no need to link the IBOutlet, delegate, data source
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]()
-//    let userDefaults = UserDefaults.standard // UserDefaults DB plist - very small save
-//    // Need to be careful when using UserDefaults, cuz it's not an actual DB
-//    // Only small amount could be saved in UserDefaults - impact efficiency if large
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+//    let userDefaults = UserDefaults.standard
+    // UserDefaults DB plist - very small save
+    // Need to be careful when using UserDefaults, cuz it's not an actual DB
+    // Only small amount could be saved in UserDefaults - impact efficiency if large
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
-  
-        loadItems()
+        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+//        loadItems()
 //        if let items = userDefaults.array(forKey: "TodoListArray") as? [Item] {
 //            itemArray = items
 //        }
@@ -56,10 +60,12 @@ class TodoListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        // Alert when user clicks the Add Item button on the UIAlert
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            // Alert when user clicks the Add Item button on the UIAlert
-            let newItem = Item()
+            
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             
 //            // Add new item to UserDefaults DB
@@ -78,29 +84,29 @@ class TodoListViewController: UITableViewController {
     
     // MARK: - Models Manipulation Methods
     func saveItems() {
-        let encoder = PropertyListEncoder()
+        
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
+            print("Saved")
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context \(error)")
         }
         
         // Reload UI so new item appears
         self.tableView.reloadData()
     }
     
-    func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error decoding item array, \(error)")
-            }
-            
-        }
-    }
+//    func loadItems() {
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error decoding item array, \(error)")
+//            }
+//
+//        }
+//    }
     
 }
 
