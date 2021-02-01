@@ -53,6 +53,10 @@ class TodoListViewController: UITableViewController {
         // Toggle done boolean - reverse value
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
 
+        // Delete item; ** Update DB before update view
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+        
         saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
     }
