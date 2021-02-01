@@ -23,7 +23,6 @@ class TodoListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("view")
         loadItems()
         
 //        if let items = userDefaults.array(forKey: "TodoListArray") as? [Item] {
