@@ -18,8 +18,6 @@ class TodoListViewController: UITableViewController {
     // Need to be careful when using UserDefaults, cuz it's not an actual DB
     // Only small amount could be saved in UserDefaults - impact efficiency if large
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     // AppDelegate = UIApplication.shared.delegate = live application object; app delegate of the app object
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
