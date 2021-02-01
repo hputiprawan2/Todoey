@@ -13,10 +13,12 @@ import CoreData
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]()
-//    let userDefaults = UserDefaults.standard // UserDefaults DB plist - very small save
-//    // Need to be careful when using UserDefaults, cuz it's not an actual DB
-//    // Only small amount could be saved in UserDefaults - impact efficiency if large
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+//    let userDefaults = UserDefaults.standard
+    // UserDefaults DB plist - very small save
+    // Need to be careful when using UserDefaults, cuz it's not an actual DB
+    // Only small amount could be saved in UserDefaults - impact efficiency if large
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     // AppDelegate = UIApplication.shared.delegate = live application object; app delegate of the app object
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -60,9 +62,10 @@ class TodoListViewController: UITableViewController {
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        // Alert when user clicks the Add Item button on the UIAlert
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // Alert when user clicks the Add Item button on the UIAlert
-            
+
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
