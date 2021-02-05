@@ -105,10 +105,16 @@ class TodoListViewController: UITableViewController {
     }
     
     // = Item.fetchRequest() is a default value
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
         
-        let predicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        request.predicate = predicate
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let additionalPredicate = predicate {
+            // Making sure the predicate is not nil
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
         
         // Fetch result in a form of item, require to specify data type
         do {
@@ -125,13 +131,13 @@ extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // Reload the tableView to what user search for
         let request: NSFetchRequest<Item> = Item.fetchRequest()
-        
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.predicate = predicate
         
         let sortDesciptor = NSSortDescriptor(key: "title", ascending: true)
         request.sortDescriptors = [sortDesciptor]
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
     }
     
     // Clear search bar
