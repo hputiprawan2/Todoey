@@ -15,7 +15,7 @@ class CategoryTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadItems()
+        loadCategories()
     }
 
     // MARK: - TableView Datasource Methods
@@ -35,6 +35,14 @@ class CategoryTableViewController: UITableViewController {
         self.performSegue(withIdentifier: "goToItems", sender: self)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! TodoListViewController
+        if let indexPath = tableView.indexPathForSelectedRow{
+            // current row that is selected
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+        }
+    }
+    
     // MARK: - Add New Category
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         var textField = UITextField()
@@ -47,7 +55,7 @@ class CategoryTableViewController: UITableViewController {
             newCategory.name = textField.text!
             self.categoryArray.append(newCategory)
 
-            self.saveItems()
+            self.saveCategories()
 
         }
         alert.addTextField { (alertTextField) in
@@ -59,7 +67,7 @@ class CategoryTableViewController: UITableViewController {
     }
     
     // MARK: - Data Manipulation Methods
-    func saveItems() {
+    func saveCategories() {
         do {
             try context.save()
         } catch {
@@ -70,7 +78,7 @@ class CategoryTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
+    func loadCategories(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
         // Fetch result in a form of item, require to specify data type
         do {
             categoryArray = try context.fetch(request)

@@ -20,6 +20,13 @@ class TodoListViewController: UITableViewController {
     
     // AppDelegate = UIApplication.shared.delegate = live application object; app delegate of the app object
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    var selectedCategory: Category? {
+        didSet {
+            // happen immediately after the variable get set with the value
+            loadItems()
+            // So when we called loadItems() we certain that we already get the value for selectedCategory, not called before which will crash the app 
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -68,6 +75,7 @@ class TodoListViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             
 //            // Add new item to UserDefaults DB
@@ -98,6 +106,10 @@ class TodoListViewController: UITableViewController {
     
     // = Item.fetchRequest() is a default value
     func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+        
+        let predicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        request.predicate = predicate
+        
         // Fetch result in a form of item, require to specify data type
         do {
             itemArray = try context.fetch(request)
