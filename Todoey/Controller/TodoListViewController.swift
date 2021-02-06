@@ -49,7 +49,17 @@ class TodoListViewController: UITableViewController {
     // MARK: - TableView Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        // Toggle done boolean - reverse value
+        if let item = todoItems?[indexPath.row] {
+            do {
+                try realm.write {
+                    item.done = !item.done // Toggle done boolean - reverse value
+                }
+            } catch {
+                print("Error saving done status \(error)")
+            }
+        }
+        tableView.reloadData()
+        
 //        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
 
         // Delete item; ** Update DB before update view
