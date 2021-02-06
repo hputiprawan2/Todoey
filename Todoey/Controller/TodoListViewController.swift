@@ -19,18 +19,18 @@ class TodoListViewController: UITableViewController {
     // Only small amount could be saved in UserDefaults - impact efficiency if large
     
     // AppDelegate = UIApplication.shared.delegate = live application object; app delegate of the app object
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var selectedCategory: Category? {
         didSet {
             // happen immediately after the variable get set with the value
-            loadItems()
+//            loadItems()
             // So when we called loadItems() we certain that we already get the value for selectedCategory, not called before which will crash the app 
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadItems()
+//        loadItems()
         
     }
 
@@ -61,93 +61,93 @@ class TodoListViewController: UITableViewController {
 //        context.delete(itemArray[indexPath.row])
 //        itemArray.remove(at: indexPath.row)
         
-        saveItems()
+//        saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
-        var textField = UITextField()
-        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
-        // Alert when user clicks the Add Item button on the UIAlert
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            // Alert when user clicks the Add Item button on the UIAlert
-
-            let newItem = Item(context: self.context)
-            newItem.title = textField.text!
-            newItem.done = false
-            newItem.parentCategory = self.selectedCategory
-            self.itemArray.append(newItem)
-            
-//            // Add new item to UserDefaults DB
-//            self.userDefaults.set(self.itemArray, forKey: "TodoListArray")
-
-            self.saveItems()
-
-        }
-        alert.addTextField { (alertTextField) in
-            alertTextField.placeholder = "Create A New Item"
-            textField = alertTextField
-        }
-        alert.addAction(action)
-        present(alert, animated: true, completion: nil)
-    }
+//    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+//        var textField = UITextField()
+//        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+//        // Alert when user clicks the Add Item button on the UIAlert
+//        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+//            // Alert when user clicks the Add Item button on the UIAlert
+//
+//            let newItem = Item(context: self.context)
+//            newItem.title = textField.text!
+//            newItem.done = false
+//            newItem.parentCategory = self.selectedCategory
+//            self.itemArray.append(newItem)
+//
+////            // Add new item to UserDefaults DB
+////            self.userDefaults.set(self.itemArray, forKey: "TodoListArray")
+//
+//            self.saveItems()
+//
+//        }
+//        alert.addTextField { (alertTextField) in
+//            alertTextField.placeholder = "Create A New Item"
+//            textField = alertTextField
+//        }
+//        alert.addAction(action)
+//        present(alert, animated: true, completion: nil)
+//    }
     
     // MARK: - Models Manipulation Methods
-    func saveItems() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context \(error)")
-        }
-        
-        // Reload UI so new item appears
-        self.tableView.reloadData()
-    }
+//    func saveItems() {
+//        do {
+//            try context.save()
+//        } catch {
+//            print("Error saving context \(error)")
+//        }
+//
+//        // Reload UI so new item appears
+//        self.tableView.reloadData()
+//    }
     
     // = Item.fetchRequest() is a default value
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
-        
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-        if let additionalPredicate = predicate {
-            // Making sure the predicate is not nil
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-        } else {
-            request.predicate = categoryPredicate
-        }
-        
-        // Fetch result in a form of item, require to specify data type
-        do {
-            itemArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        tableView.reloadData()
-    }
+//    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+//
+//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+//
+//        if let additionalPredicate = predicate {
+//            // Making sure the predicate is not nil
+//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+//        } else {
+//            request.predicate = categoryPredicate
+//        }
+//
+//        // Fetch result in a form of item, require to specify data type
+//        do {
+//            itemArray = try context.fetch(request)
+//        } catch {
+//            print("Error fetching data from context \(error)")
+//        }
+//        tableView.reloadData()
+//    }
 }
 
 // MARK: - SearchBar Methods
-extension TodoListViewController: UISearchBarDelegate {
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // Reload the tableView to what user search for
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        request.predicate = predicate
-        
-        let sortDesciptor = NSSortDescriptor(key: "title", ascending: true)
-        request.sortDescriptors = [sortDesciptor]
-        
-        loadItems(with: request, predicate: predicate)
-    }
-    
-    // Clear search bar
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder() // keyboard goes away
-            }
-            
-        }
-    }
-}
+//extension TodoListViewController: UISearchBarDelegate {
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        // Reload the tableView to what user search for
+//        let request: NSFetchRequest<Item> = Item.fetchRequest()
+//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//        request.predicate = predicate
+//
+//        let sortDesciptor = NSSortDescriptor(key: "title", ascending: true)
+//        request.sortDescriptors = [sortDesciptor]
+//
+//        loadItems(with: request, predicate: predicate)
+//    }
+//
+//    // Clear search bar
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text?.count == 0 {
+//            loadItems()
+//            DispatchQueue.main.async {
+//                searchBar.resignFirstResponder() // keyboard goes away
+//            }
+//
+//        }
+//    }
+//}
