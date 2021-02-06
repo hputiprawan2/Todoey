@@ -60,14 +60,6 @@ class TodoListViewController: UITableViewController {
             }
         }
         tableView.reloadData()
-        
-//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
-
-        // Delete item; ** Update DB before update view
-//        context.delete(itemArray[indexPath.row])
-//        itemArray.remove(at: indexPath.row)
-        
-//        saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -115,7 +107,6 @@ class TodoListViewController: UITableViewController {
     
     
     func loadItems() {
-
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true) // get all the item that belongs to that selected category
         tableView.reloadData()
     }
@@ -125,7 +116,8 @@ class TodoListViewController: UITableViewController {
 extension TodoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // Reload the tableView to what user search for
-        todoItems = todoItems?.filter("title CONTAIN[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        tableView.reloadData()
     }
 
     // Clear search bar
