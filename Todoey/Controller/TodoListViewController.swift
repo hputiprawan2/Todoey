@@ -121,27 +121,20 @@ class TodoListViewController: UITableViewController {
 }
 
 // MARK: - SearchBar Methods
-//extension TodoListViewController: UISearchBarDelegate {
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        // Reload the tableView to what user search for
-//        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//        request.predicate = predicate
-//
-//        let sortDesciptor = NSSortDescriptor(key: "title", ascending: true)
-//        request.sortDescriptors = [sortDesciptor]
-//
-//        loadItems(with: request, predicate: predicate)
-//    }
-//
-//    // Clear search bar
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder() // keyboard goes away
-//            }
-//
-//        }
-//    }
-//}
+extension TodoListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        // Reload the tableView to what user search for
+        todoItems = todoItems?.filter("title CONTAIN[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
+    }
+
+    // Clear search bar
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder() // keyboard goes away
+            }
+
+        }
+    }
+}
