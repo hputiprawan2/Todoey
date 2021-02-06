@@ -6,47 +6,42 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 // Inherite UITableViewController and having a UITableViewController (instead just View)
 // no need to link the IBOutlet, delegate, data source
 class TodoListViewController: UITableViewController {
 
-    var itemArray = [Item]()
-//    let userDefaults = UserDefaults.standard
-    // UserDefaults DB plist - very small save
-    // Need to be careful when using UserDefaults, cuz it's not an actual DB
-    // Only small amount could be saved in UserDefaults - impact efficiency if large
+    var todoItems: Results<Item>?
+    let realm = try! Realm()
     
-    // AppDelegate = UIApplication.shared.delegate = live application object; app delegate of the app object
-//    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     var selectedCategory: Category? {
         didSet {
             // happen immediately after the variable get set with the value
-//            loadItems()
+            loadItems()
             // So when we called loadItems() we certain that we already get the value for selectedCategory, not called before which will crash the app 
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        loadItems()
-        
     }
 
     // MARK: - TableView Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArray.count
+        return todoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
-        let item = itemArray[indexPath.row]
-        
-        cell.textLabel?.text = item.title
-        
-        // Ternary Operator -> value = condition ? valueIfTrue : valueIfFalse
-        cell.accessoryType = item.done ? .checkmark : .none
+        if let item = todoItems?[indexPath.row] {
+            cell.textLabel?.text = item.title
+            
+            // Ternary Operator -> value = condition ? valueIfTrue : valueIfFalse
+            cell.accessoryType = item.done ? .checkmark : .none
+        } else {
+            cell.textLabel?.text = "No Item Added"
+        }
         
         return cell
     }
@@ -55,7 +50,7 @@ class TodoListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         // Toggle done boolean - reverse value
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+//        todoItems[indexPath.row].done = !todoItems[indexPath.row].done
 
         // Delete item; ** Update DB before update view
 //        context.delete(itemArray[indexPath.row])
@@ -65,65 +60,53 @@ class TodoListViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-//    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
-//        var textField = UITextField()
-//        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
-//        // Alert when user clicks the Add Item button on the UIAlert
-//        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-//            // Alert when user clicks the Add Item button on the UIAlert
-//
-//            let newItem = Item(context: self.context)
-//            newItem.title = textField.text!
-//            newItem.done = false
-//            newItem.parentCategory = self.selectedCategory
-//            self.itemArray.append(newItem)
-//
-////            // Add new item to UserDefaults DB
-////            self.userDefaults.set(self.itemArray, forKey: "TodoListArray")
-//
-//            self.saveItems()
-//
-//        }
-//        alert.addTextField { (alertTextField) in
-//            alertTextField.placeholder = "Create A New Item"
-//            textField = alertTextField
-//        }
-//        alert.addAction(action)
-//        present(alert, animated: true, completion: nil)
-//    }
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        // Alert when user clicks the Add Item button on the UIAlert
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            // Alert when user clicks the Add Item button on the UIAlert
+
+            do {
+                if let currentCategory = self.selectedCategory {
+                    try self.realm.write{
+                        let newItem = Item()
+                        newItem.title = textField.text!
+                        currentCategory.items.append(newItem)
+                    }
+                }
+            } catch {
+                print("Error saving new items, \(error)")
+            }
+            self.tableView.reloadData()
+        }
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create A New Item"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
     
     // MARK: - Models Manipulation Methods
-//    func saveItems() {
-//        do {
-//            try context.save()
-//        } catch {
-//            print("Error saving context \(error)")
-//        }
-//
-//        // Reload UI so new item appears
-//        self.tableView.reloadData()
-//    }
+    func saveItems(item: Item) {
+        do {
+            try realm.write {
+                realm.add(item)
+            }
+        } catch {
+            print("Error saving context \(error)")
+        }
+        // Reload UI so new item appears
+        self.tableView.reloadData()
+    }
     
-    // = Item.fetchRequest() is a default value
-//    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
-//
-//        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-//
-//        if let additionalPredicate = predicate {
-//            // Making sure the predicate is not nil
-//            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
-//        } else {
-//            request.predicate = categoryPredicate
-//        }
-//
-//        // Fetch result in a form of item, require to specify data type
-//        do {
-//            itemArray = try context.fetch(request)
-//        } catch {
-//            print("Error fetching data from context \(error)")
-//        }
-//        tableView.reloadData()
-//    }
+    
+    func loadItems() {
+
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true) // get all the item that belongs to that selected category
+        tableView.reloadData()
+    }
 }
 
 // MARK: - SearchBar Methods
