@@ -12,12 +12,10 @@ import SwipeCellKit
 class CategoryTableViewController: SwipeTableViewController {
 
     let realm = try! Realm()
-    
     var categories: Results<Category>? // auto-updating container type in Realm
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.rowHeight = 80.0
         loadCategories()
     }
 

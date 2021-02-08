@@ -7,14 +7,14 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 // Inherite UITableViewController and having a UITableViewController (instead just View)
 // no need to link the IBOutlet, delegate, data source
-class TodoListViewController: UITableViewController {
+class TodoListViewController: SwipeTableViewController {
 
-    var todoItems: Results<Item>?
     let realm = try! Realm()
-    
+    var todoItems: Results<Item>?
     var selectedCategory: Category? {
         didSet {
             // happen immediately after the variable get set with the value
@@ -33,7 +33,8 @@ class TodoListViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath) // tap into that cell
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
             
@@ -42,7 +43,6 @@ class TodoListViewController: UITableViewController {
         } else {
             cell.textLabel?.text = "No Item Added"
         }
-        
         return cell
     }
     
@@ -52,7 +52,6 @@ class TodoListViewController: UITableViewController {
         if let item = todoItems?[indexPath.row] {
             do {
                 try realm.write {
-//                    realm.delete(item)
                     item.done = !item.done // Toggle done boolean - reverse value
                 }
             } catch {
@@ -105,10 +104,21 @@ class TodoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    
     func loadItems() {
         todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true) // get all the item that belongs to that selected category
         tableView.reloadData()
+    }
+    
+    override func updateModel(at indexPath: IndexPath) {
+        if let currentItem = self.todoItems?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(currentItem)
+                }
+            } catch {
+                print("Error saving done status \(error)")
+            }
+        }
     }
 }
 
