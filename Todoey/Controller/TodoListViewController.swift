@@ -8,6 +8,7 @@
 import UIKit
 import RealmSwift
 import SwipeCellKit
+import ChameleonFramework
 
 // Inherite UITableViewController and having a UITableViewController (instead just View)
 // no need to link the IBOutlet, delegate, data source
@@ -37,6 +38,12 @@ class TodoListViewController: SwipeTableViewController {
         let cell = super.tableView(tableView, cellForRowAt: indexPath) // tap into that cell
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
+            // UIColor(hexString: selectedCategory!.color)? = If the hex value is not valid, don't darken
+            // selectedCategory! = safe to unwrap because todoItems?[indexPath.row] is not nil and todoItems comes from selectedCategory, so selectedCategory is not nil
+            if let color = UIColor(hexString: selectedCategory!.color)?.darken(byPercentage: CGFloat(indexPath.row) / CGFloat(todoItems!.count)) {
+                cell.backgroundColor = color
+                cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            }
             
             // Ternary Operator -> value = condition ? valueIfTrue : valueIfFalse
             cell.accessoryType = item.done ? .checkmark : .none
