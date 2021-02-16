@@ -18,14 +18,19 @@ class CategoryTableViewController: SwipeTableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadCategories()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        guard let navBar = navigationController?.navigationBar else {
+            fatalError("Navigation controller does not exist.")}
         if #available(iOS 13.0, *) {
             let navBarAppearance = UINavigationBarAppearance()
             navBarAppearance.configureWithOpaqueBackground()
-            navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-            navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            navBarAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(#colorLiteral(red: 0.910805583, green: 0.4249960184, blue: 0.6569120288, alpha: 1), returnFlat: true)] // font title color
             navBarAppearance.backgroundColor = #colorLiteral(red: 0.910805583, green: 0.4249960184, blue: 0.6569120288, alpha: 1)
-            self.navigationController?.navigationBar.standardAppearance = navBarAppearance
-            self.navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
+            navBar.tintColor = ContrastColorOf(#colorLiteral(red: 0.910805583, green: 0.4249960184, blue: 0.6569120288, alpha: 1), returnFlat: true) // font navBar color
+            navBar.scrollEdgeAppearance = navBarAppearance // set entire background beyond safeview
         }
     }
 

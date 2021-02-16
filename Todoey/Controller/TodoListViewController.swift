@@ -30,14 +30,21 @@ class TodoListViewController: SwipeTableViewController {
             title = selectedCategory!.name // already in selectedCategory so guranteed to force unwrap
             guard let navBar = navigationController?.navigationBar else {
                 fatalError("Navigation controller does not exist.")}
+            
+            if let navBarColor = UIColor(hexString: hexColor) {
                 if #available(iOS 13.0, *) {
                     let navBarAppearance = UINavigationBarAppearance()
                     navBarAppearance.configureWithOpaqueBackground()
-                    navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-                    navBarAppearance.backgroundColor = UIColor(hexString: hexColor)
+                    navBarAppearance.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColor, returnFlat: true)]
+                    navBarAppearance.backgroundColor = navBarColor
                     navBar.scrollEdgeAppearance = navBarAppearance
+                    navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+                    searchBar.barTintColor = navBarColor
                 }
-            searchBar.barTintColor = UIColor(hexString: hexColor)
+                
+            }
+                
+            
         }
     }
     
