@@ -24,8 +24,25 @@ class TodoListViewController: SwipeTableViewController {
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        if let hexColor = selectedCategory?.color {
+            title = selectedCategory!.name // already in selectedCategory so guranteed to force unwrap
+            guard let navBar = navigationController?.navigationBar else {
+                fatalError("Navigation controller does not exist.")}
+                if #available(iOS 13.0, *) {
+                    let navBarAppearance = UINavigationBarAppearance()
+                    navBarAppearance.configureWithOpaqueBackground()
+                    navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+                    navBarAppearance.backgroundColor = UIColor(hexString: hexColor)
+                    navBar.scrollEdgeAppearance = navBarAppearance
+                }
+        }
+    }
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+       
     }
 
     // MARK: - TableView Datasource Methods
