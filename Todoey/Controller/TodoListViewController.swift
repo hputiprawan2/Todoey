@@ -23,6 +23,7 @@ class TodoListViewController: SwipeTableViewController {
             // So when we called loadItems() we certain that we already get the value for selectedCategory, not called before which will crash the app 
         }
     }
+    @IBOutlet weak var searchBar: UISearchBar!
     
     override func viewWillAppear(_ animated: Bool) {
         if let hexColor = selectedCategory?.color {
@@ -36,6 +37,7 @@ class TodoListViewController: SwipeTableViewController {
                     navBarAppearance.backgroundColor = UIColor(hexString: hexColor)
                     navBar.scrollEdgeAppearance = navBarAppearance
                 }
+            searchBar.barTintColor = UIColor(hexString: hexColor)
         }
     }
     
